@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "EditorConfig.EditorConfig",
+        "ms-python.python",
+        "mikoz.black-py",
+        "esbenp.prettier-vscode"
+    ]
+}
