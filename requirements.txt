@@ -1,3 +1,4 @@
+autoload-module==2.0.0
 black==24.10.0
 certifi==2024.8.30
 charset-normalizer==3.4.0
@@ -9,5 +10,6 @@ pathspec==0.12.1
 platformdirs==4.3.6
 requests==2.32.3
 setuptools==75.3.0
+tqdm==4.67.0
 urllib3==2.2.3
 wheel==0.44.0
