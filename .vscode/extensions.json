@@ -2,7 +2,7 @@
     "recommendations": [
         "EditorConfig.EditorConfig",
         "ms-python.python",
-        "mikoz.black-py",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "ms-python.black-formatter"
     ]
 }

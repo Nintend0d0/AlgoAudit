@@ -8,8 +8,6 @@ for Scraper in scraper_classes:
 
     scraper = Scraper()
 
-    print(f"Scraping \"{scraper.NAME}\".")
+    print(f'Scraping "{scraper.NAME}".')
 
     scraper.print()
-
-

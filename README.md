@@ -15,6 +15,16 @@ python main.py
 
 ## Setup
 
+### Python
+
+#### Using Conda (recommended)
+
+```sh
+conda create -p ./envs python=3.12.*
+conda activate -p ./envs
+pip install -r requirements.txt
+```
+
 ### VSCode
 
 Copy `settings.json.default` to `settings.json`.
@@ -26,13 +36,3 @@ cp .vscode/settings.json.default .vscode/settings.json
 Make sure you're using the correct interpreter with VSCode.
 
 <kbd>CTRL</kbd> + <kbd>P</kbd> > "Python: Select Interpreter" > ".envs/bin/python".
-
-### Python
-
-#### Using Conda (recommended)
-
-```sh
-conda create -p ./envs python=3.12.*
-conda actiavet -p ./envs
-pip install -r requirements.txt
-```

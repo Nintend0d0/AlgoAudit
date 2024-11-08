@@ -2,6 +2,6 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[python]": {
-        "editor.defaultFormatter": "mikoz.black-py"
+        "editor.defaultFormatter": "ms-python.black-formatter"
     }
 }
