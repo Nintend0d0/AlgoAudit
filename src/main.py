@@ -4,7 +4,7 @@ from tqdm import tqdm
 import csv
 import os.path
 
-# Our scraper "interface"
+# Our scraper "interface" and our CSV fieldnames
 from Scraper import Scraper, fieldnames
 
 # Imports all classes from ./scrapers
@@ -23,6 +23,17 @@ for group in KEYWORD_GROUPS:
         print(f'Filepath "{filepath}" not found! Creating...')
         csv.DictWriter(open(filepath, "a"), fieldnames).writeheader()
 
+# TODO: Check for correctness
+# keep track of progress
+previous_progress = {"keywords": set(), "pages": set()}
+for group in KEYWORD_GROUPS:
+    # Read the CSV file
+    with open(f"ouput/{group}.csv", mode="r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            previous_progress["keywords"].add(row["keyword"])
+            previous_progress["pages"].add(row["page"])
+
 # loop trough it (using tqdm to show process)
 # a good thing is, when we always go one site after the other, we automatically have some cooldown
 group_progress = tqdm(KEYWORD_GROUPS, desc="Group")
@@ -39,6 +50,17 @@ for group in group_progress:
             scraper: Scraper = SC(group_progress.write, CONFIG)
 
             keyword_progress.set_postfix_str(scraper.NAME)
+
+            # skip already scraped keywords and pages
+            if (
+                previous_progress["keywords"]
+                and previous_progress["pages"]
+                and keyword in previous_progress["keywords"]
+                and scraper.NAME in previous_progress["pages"]
+            ):
+                group_progress.write(f"Skipping '{keyword}' on '{scraper.NAME}'!")
+                continue
+
             group_progress.write(f"Scraping for '{keyword}' on '{scraper.NAME}'.")
 
             # does the request
@@ -58,7 +80,3 @@ for group in group_progress:
 
             # store to csv, ideally as a stream (one row at the time)
             csv.DictWriter(open(f"ouput/{group}.csv", "a"), fieldnames).writerows(rows)
-
-# Ouput, all pages get their own csv file
-# Example header of jobs-ch.csv
-# portal, keyword, position, salary, ...
