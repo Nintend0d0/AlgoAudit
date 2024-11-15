@@ -8,7 +8,6 @@ mypy-extensions==1.0.0
 packaging==24.1
 pathspec==0.12.1
 platformdirs==4.3.6
-progressbar2==4.5.0
 python-utils==3.9.0
 PyYAML==6.0.2
 requests==2.32.3

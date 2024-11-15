@@ -1,6 +1,8 @@
 from Scraper import Scraper
 from requests import Response
 
+# IMPORTATN: Don't use print() use self.write()
+
 
 class Demo(Scraper):
 
@@ -8,9 +10,10 @@ class Demo(Scraper):
     URL_TEMPLATE = ""
 
     def fetch(self, keywords: str) -> Response:
-        print("I fetch")
         return Response()
 
-    def parse(self, html: str) -> str:
-        print("I parse")
-        return ""
+    def parse(self, html: str) -> list[dict]:
+        return [
+            {"rank": 1, "title": "Demo Titel 1", "pensum": "100%"},
+            {"rank": 2, "title": "Demo Titel 2", "pensum": "50%"},
+        ]
