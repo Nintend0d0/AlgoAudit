@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from requests import Response
+import requests
 
 
 class Scraper(ABC):
@@ -13,7 +13,7 @@ class Scraper(ABC):
         super().__init__()
 
     @abstractmethod
-    def fetch(self, keywords: str) -> Response:
+    def fetch(self, keyword: str) -> requests.Response:
         pass
 
     @abstractmethod

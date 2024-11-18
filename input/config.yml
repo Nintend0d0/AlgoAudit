@@ -1,2 +1,4 @@
-locations:
-    - { name: Zürich, distance: 20 }
+# FUTURE: list for multiple locations
+location:
+    name: Zürich
+    distance: 20
