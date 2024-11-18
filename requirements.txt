@@ -1,4 +1,5 @@
 autoload-module==2.0.0
+beautifulsoup4==4.12.3
 black==24.10.0
 certifi==2024.8.30
 charset-normalizer==3.4.0
@@ -12,6 +13,7 @@ python-utils==3.9.0
 PyYAML==6.0.2
 requests==2.32.3
 setuptools==75.3.0
+soupsieve==2.6
 tqdm==4.67.0
 typing_extensions==4.12.2
 urllib3==2.2.3

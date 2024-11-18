@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Tuple
 import requests
 
 
@@ -12,8 +13,13 @@ class Scraper(ABC):
         self.config = config
         super().__init__()
 
+    def pages(self, keyword: str) -> Tuple[int, requests.Response]:
+        response = requests.Response()
+        response.status_code = 200
+        return 1, response
+
     @abstractmethod
-    def fetch(self, keyword: str) -> requests.Response:
+    def fetch(self, keyword: str, page: int) -> requests.Response:
         pass
 
     @abstractmethod
@@ -21,4 +27,4 @@ class Scraper(ABC):
         pass
 
 
-fieldnames = ["keyword", "page", "rank", "title", "pensum"]
+fieldnames = ["keyword", "site", "page", "total pages", "rank", "title", "pensum"]

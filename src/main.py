@@ -1,6 +1,6 @@
 from autoload import ModuleLoader
 import yaml
-from tqdm import tqdm
+from tqdm import tqdm, trange
 import csv
 import os.path
 import urllib.parse
@@ -79,39 +79,63 @@ for group in group_progress:
 
             group_progress.write(f"Scraping for '{keyword}' on '{scraper.NAME}'.")
 
-            # does the request (the keyword has to be url safe)
-            response = scraper.fetch(urllib.parse.quote(keyword))
+            pages, pages_response = scraper.pages(urllib.parse.quote(keyword))
 
-            # COMMENT ME - temporary sleep, to prevent blockage while testing
-            # time.sleep(2)
-
-            # "handle" errors
-            if response.status_code != 200:
+            if pages_response.status_code != 200:
                 group_progress.write(
-                    f"ERROR! While getting '{keyword}' on '{scraper.NAME}'."
+                    f"ERROR! While getting page count with '{keyword}' on '{scraper.NAME}'."
                 )
                 group_progress.write(
-                    f"Code: {response.status_code} Message: {response.reason}."
+                    f"Code: {pages_response.status_code} Message: {pages_response.reason}."
                 )
                 open("ouput/error.log", "a").write(
-                    f"{time.strftime("%Y-%m-%d %H:%M:%S")}\tERROR! While getting  '{keyword}' on  '{scraper.NAME}'. Code: {response.status_code} Message:  {response.reason}.\n"
+                    f"{time.strftime("%Y-%m-%d %H:%M:%S")}\tERROR! While getting page count with  '{keyword}' on  '{scraper.NAME}'. Code: {pages_response.status_code} Message:  {pages_response.reason}.\n"
                 )
                 # just continue, ideally we will just be able to re-run later.
                 statistics["failed"] += 1
                 continue
 
-            # parses using beautifulsoup
-            results = scraper.parse(response.text)
+            rows_pages = []
+            for page in trange(1, pages + 1, desc="Page", leave=False):
+                # wait a bit before next page
+                time.sleep(2)
 
-            def include_additional_headers(row):
-                row["keyword"] = keyword
-                row["page"] = scraper.NAME
-                return row
+                # does the request (the keyword has to be url safe)
+                response = scraper.fetch(urllib.parse.quote(keyword), page)
 
-            rows = map(include_additional_headers, results)
+                # "handle" errors
+                if response.status_code != 200:
+                    group_progress.write(
+                        f"ERROR! While getting '{keyword}' on '{scraper.NAME}' on page {page} of {pages}."
+                    )
+                    group_progress.write(
+                        f"Code: {response.status_code} Message: {response.reason}."
+                    )
+                    open("ouput/error.log", "a").write(
+                        f"{time.strftime("%Y-%m-%d %H:%M:%S")}\tERROR! While getting  '{keyword}' on  '{scraper.NAME}'  on page {page} of {pages}. Code: {response.status_code} Message:  {response.reason}.\n"
+                    )
+                    # as the scrape is not complete we have to abort...
+                    # Warning LOOSES everything of current keywoard scrape! (by design)
+                    break
 
-            # store to csv, ideally as a stream (one row at the time)
-            csv.DictWriter(open(f"ouput/{group}.csv", "a"), fieldnames).writerows(rows)
+                # parses using beautifulsoup
+                results = scraper.parse(response.text)
+
+                def include_additional_headers(row):
+                    row["keyword"] = keyword
+                    row["site"] = scraper.NAME
+                    row["page"] = page
+                    row["total pages"] = pages
+                    return row
+
+                rows = map(include_additional_headers, results)
+
+                rows_pages.append(rows)
+
+            # when ALL pages scraped store to csv
+            with open(f"ouput/{group}.csv", "a") as ouput:
+                for rows in rows_pages:
+                    csv.DictWriter(ouput, fieldnames).writerows(rows)
 
             statistics["success"] += 1
 
