@@ -36,14 +36,14 @@ for group in KEYWORD_GROUPS:
 
 # TODO: Check for correctness
 # keep track of progress
-previous_progress = {"keywords": set(), "pages": set()}
+previous_progress = {"keywords": set(), "sites": set()}
 for group in KEYWORD_GROUPS:
     # Read the CSV file
     with open(f"ouput/{group}.csv", mode="r") as file:
         reader = csv.DictReader(file)
         for row in reader:
             previous_progress["keywords"].add(row["keyword"])
-            previous_progress["pages"].add(row["page"])
+            previous_progress["sites"].add(row["site"])
 
 # for nice output
 statistics = {"total": 0, "success": 0, "failed": 0}
@@ -70,9 +70,9 @@ for group in group_progress:
             # skip already scraped keywords and pages
             if (
                 previous_progress["keywords"]
-                and previous_progress["pages"]
+                and previous_progress["sites"]
                 and keyword in previous_progress["keywords"]
-                and scraper.NAME in previous_progress["pages"]
+                and scraper.NAME in previous_progress["sites"]
             ):
                 group_progress.write(f"Skipping '{keyword}' on '{scraper.NAME}'!")
                 continue
@@ -95,7 +95,7 @@ for group in group_progress:
                 statistics["failed"] += 1
                 continue
 
-            rows_pages = []
+            total_rows = []
             for page in trange(1, pages + 1, desc="Page", leave=False):
                 # wait a bit before next page
                 time.sleep(2)
@@ -128,14 +128,14 @@ for group in group_progress:
                     row["total pages"] = pages
                     return row
 
-                rows = map(include_additional_headers, results)
+                page_rows = map(include_additional_headers, results)
 
-                rows_pages.append(rows)
+                total_rows.extend(page_rows)
 
             # when ALL pages scraped store to csv
-            with open(f"ouput/{group}.csv", "a") as ouput:
-                for rows in rows_pages:
-                    csv.DictWriter(ouput, fieldnames).writerows(rows)
+            csv.DictWriter(open(f"ouput/{group}.csv", "a"), fieldnames).writerows(
+                total_rows
+            )
 
             statistics["success"] += 1
 

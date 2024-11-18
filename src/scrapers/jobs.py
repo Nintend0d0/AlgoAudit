@@ -30,7 +30,7 @@ class Jobs(Scraper):
         if last_site_link_span is None:
             raise RuntimeError("Jobs.ch paginator selector not correct anymore.")
 
-        last_site_link_text = last_site_link_span.contents[0].get_text()
+        last_site_link_text = last_site_link_span.get_text()
 
         pages = int(last_site_link_text.split(" ")[-1])
 
@@ -45,11 +45,35 @@ class Jobs(Scraper):
         )
 
     def parse(self, html: str) -> list[dict]:
-        # self.write(html)
+        result = []
 
-        # exit(0)
+        site = BeautifulSoup(html, "html.parser")
 
-        return [
-            {"rank": 1, "title": "Demo Titel 1", "pensum": "100%"},
-            {"rank": 2, "title": "Demo Titel 2", "pensum": "50%"},
-        ]
+        # amount found
+        span_page_header = site.select_one('span[data-cy="page-header"]')
+
+        if span_page_header is None:
+            raise RuntimeError("Jobs.ch page header selector not correct anymore.")
+
+        span_page_header_text = span_page_header.get_text()
+        amount_found = span_page_header_text.split(" ")[0]
+
+        # get all search results plus advertisment
+        jobs = site.select(
+            'div[data-feat="boosted_jobs"],div[data-feat="searched_jobs"]'
+        )
+
+        for rank, job in enumerate(jobs):
+            is_ad = job["data-feat"] == "boosted_jobs"
+            # TODO: parse job
+            result.append(
+                {
+                    "amount found": amount_found,
+                    "rank": rank,
+                    "ad": is_ad,
+                    "title": f"todo {rank}",
+                    "pensum": f"todo {rank}",
+                }
+            )
+
+        return result

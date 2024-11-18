@@ -27,4 +27,16 @@ class Scraper(ABC):
         pass
 
 
-fieldnames = ["keyword", "site", "page", "total pages", "rank", "title", "pensum"]
+fieldnames = [
+    # in main
+    "keyword",
+    "site",
+    "page",
+    "total pages",
+    # in scraper
+    "amount found",
+    "rank",
+    "ad",
+    "title",
+    "pensum",
+]
