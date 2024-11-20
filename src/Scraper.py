@@ -38,5 +38,9 @@ fieldnames = [
     "rank",
     "ad",
     "title",
-    "pensum",
+    "pensum string",
+    "pensum pertencage",
+    "release date",
+    "locations",
+    "employer",
 ]

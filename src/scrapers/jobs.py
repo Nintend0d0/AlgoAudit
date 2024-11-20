@@ -64,16 +64,64 @@ class Jobs(Scraper):
         )
 
         for rank, job in enumerate(jobs):
+
+            # Tip: use following to inspect what you have selected
+            # open("ouput/example.html", "w").write(job.prettify())
+            # exit()
+
+            # ad
             is_ad = job["data-feat"] == "boosted_jobs"
-            # TODO: parse job
+
+            # release date
+            release_date_span = job.select_one('span[aria-hidden="true"]')
+            release_date = release_date_span.get("title") if release_date_span else None
+
+            # starting point for other elements too
+            merken_button = job.select_one('button[title="Merken"]')
+
+            # pylance/pyright cant handle beautifulsoup correctly :(
+
+            # title
+            title_div = merken_button.next_sibling if merken_button else None
+            title_span = title_div.span if title_div else None  # type: ignore
+            title = title_span.get_text() if title_span else None
+
+            meta_div = title_div.next_sibling if title_div else None
+            meta_ps = meta_div.select("div>p") if meta_div else None  # type: ignore
+
+            if meta_ps and len(meta_ps) == 3:  # type: ignore
+                # locations
+                locations = meta_ps[0].get_text()
+                # pensum percentage
+                pensum_percentage = meta_ps[1].get_text()
+                # pensum string
+                pensum_sring = meta_ps[2].get_text()
+            else:
+                locations, pensum_percentage, pensum_sring = None, None, None
+
+            # employer
+            employer_div = meta_div.next_sibling if title_div else None  # type: ignore
+            employer_strong = (
+                employer_div.select_one("strong") if employer_div else None  # type: ignore
+            )
+            employer = employer_strong.get_text() if employer_strong else None  # type: ignore
+
             result.append(
                 {
                     "amount found": amount_found,
                     "rank": rank,
                     "ad": is_ad,
-                    "title": f"todo {rank}",
-                    "pensum": f"todo {rank}",
+                    "title": title,
+                    "release date": release_date,
+                    "pensum string": pensum_sring,
+                    "pensum pertencage": pensum_percentage,
+                    "locations": locations,
+                    "employer": employer,
                 }
             )
+
+        # view data
+        # self.write(result.__repr__())
+        # exit(0)
 
         return result
