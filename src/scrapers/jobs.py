@@ -106,11 +106,16 @@ class Jobs(Scraper):
             )
             employer = employer_strong.get_text() if employer_strong else None  # type: ignore
 
+            # ad id
+            job_ad_link = job.select_one('article>a')['href']
+            job_ad_id = job_ad_link.split("/")[-2]
+
             result.append(
                 {
                     "amount found": amount_found,
                     "rank": rank,
                     "ad": is_ad,
+                    "job ad id": job_ad_id,
                     "title": title,
                     "release date": release_date,
                     "pensum string": pensum_string,
