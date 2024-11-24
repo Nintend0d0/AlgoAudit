@@ -3,7 +3,7 @@ from typing import Tuple
 import requests
 from bs4 import BeautifulSoup
 
-# IMPORTATN: Don't use print() use self.write()
+# IMPORTANT: Don't use print() use self.write()
 
 
 class Jobs(Scraper):
@@ -58,7 +58,7 @@ class Jobs(Scraper):
         span_page_header_text = span_page_header.get_text()
         amount_found = span_page_header_text.split(" ")[0]
 
-        # get all search results plus advertisment
+        # get all search results plus advertisement
         jobs = site.select(
             'div[data-feat="boosted_jobs"],div[data-feat="searched_jobs"]'
         )
@@ -66,7 +66,7 @@ class Jobs(Scraper):
         for rank, job in enumerate(jobs):
 
             # Tip: use following to inspect what you have selected
-            # open("ouput/example.html", "w").write(job.prettify())
+            # open("output/example.html", "w").write(job.prettify())
             # exit()
 
             # ad
@@ -95,9 +95,9 @@ class Jobs(Scraper):
                 # pensum percentage
                 pensum_percentage = meta_ps[1].get_text()
                 # pensum string
-                pensum_sring = meta_ps[2].get_text()
+                pensum_string = meta_ps[2].get_text()
             else:
-                locations, pensum_percentage, pensum_sring = None, None, None
+                locations, pensum_percentage, pensum_string = None, None, None
 
             # employer
             employer_div = meta_div.next_sibling if title_div else None  # type: ignore
@@ -113,8 +113,8 @@ class Jobs(Scraper):
                     "ad": is_ad,
                     "title": title,
                     "release date": release_date,
-                    "pensum string": pensum_sring,
-                    "pensum pertencage": pensum_percentage,
+                    "pensum string": pensum_string,
+                    "pensum percentage": pensum_percentage,
                     "locations": locations,
                     "employer": employer,
                 }

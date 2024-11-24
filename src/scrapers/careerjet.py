@@ -57,7 +57,7 @@ class Careerjet(Scraper):
         number_of_jobs_text = number_of_jobs_span.get_text().strip()
         amount_found = int(number_of_jobs_text.split(" ")[0])
 
-        # get all search results plus advertisment
+        # get all search results plus advertisement
         jobs = site.select(
             'div[id="search-content"]>ul[class="jobs"]>li:not(.cjgad-outer)'
         )

@@ -40,7 +40,7 @@ fieldnames = [
     "ad",
     "title",
     "pensum string",
-    "pensum pertencage",
+    "pensum percentage",
     "release date",
     "locations",
     "employer",
