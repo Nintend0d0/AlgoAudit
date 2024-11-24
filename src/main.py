@@ -6,6 +6,9 @@ import os.path
 import urllib.parse
 import time
 
+# Define cooldown time
+COOLDOWN_TIME = 0
+
 start_time = time.time()
 
 # Our scraper "interface" and our CSV fieldnames
@@ -98,7 +101,7 @@ for group in group_progress:
             total_rows = []
             for page in trange(1, pages + 1, desc="Page", leave=False):
                 # wait a bit before next page
-                time.sleep(2)
+                time.sleep(COOLDOWN_TIME)
 
                 # does the request (the keyword has to be url safe)
                 response = scraper.fetch(urllib.parse.quote(keyword), page)
