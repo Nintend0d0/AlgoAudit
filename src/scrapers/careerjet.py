@@ -27,11 +27,12 @@ class Careerjet(Scraper):
         number_of_jobs_span = site.select_one('div[id="search-content"]>header>p>span')
 
         if number_of_jobs_span is None:
-            raise RuntimeError("careerjet.ch number of jobs selector not correct anymore.")
-
-        number_of_jobs_text = number_of_jobs_span.get_text().strip()
-        number_of_jobs = int(number_of_jobs_text.split(" ")[0])
-        pages = math.ceil(number_of_jobs / 20)
+            self.write(f"No results found for {keyword}")
+            pages = 0
+        else:
+            number_of_jobs_text = number_of_jobs_span.get_text().strip()
+            number_of_jobs = int(number_of_jobs_text.split(" ")[0])
+            pages = math.ceil(number_of_jobs / 20)
 
         return pages, response
 

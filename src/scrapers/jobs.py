@@ -28,11 +28,12 @@ class Jobs(Scraper):
         )
 
         if last_site_link_span is None:
-            raise RuntimeError("Jobs.ch paginator selector not correct anymore.")
-
-        last_site_link_text = last_site_link_span.get_text()
-
-        pages = int(last_site_link_text.split(" ")[-1])
+            self.write(f"No results found for {keyword}")
+            pages = 0
+            # raise RuntimeError("Jobs.ch paginator selector not correct anymore.")
+        else:
+            last_site_link_text = last_site_link_span.get_text()
+            pages = int(last_site_link_text.split(" ")[-1])
 
         return pages, response
 
