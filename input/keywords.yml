@@ -1,8 +1,478 @@
+apotheke:
+- Apotheker
+- Apothekerin
+- Fachkraft Apotheke
+architektur:
+- Architekt
+- Architektin
+- Architektur
+arzt:
+- Arzt
+- Ärztin
+- Ärztliche Fachkraft
+augenoptik:
+- Augenoptiker
+- Augenoptikerin
+- Augenoptikfachperson
+automatik:
+- Automatiker
+- Automatikerin
+- Automatik
+automobil:
+- Automobilverkaufsberater
+- Automobilverkaufsberaterin
+- Automobilverkaufsberatung
+bank:
+- Bankberater
+- Bankberaterin
+- Bankberatung
+bau:
+- Bauleiter
+- Bauleiterin
+- Bauleitung
+bauingenieruwesen:
+- Bauingenieur
+- Bauingenieurin
+- Bauingenieurwesen
+baumaschinen:
+- Baumaschinenführer
+- Baumaschinenführerin
+- Baumaschinenfachkraft
+baumaschinenmechanik:
+- Baumaschinenmechaniker
+- Baumaschinenmechanikerin
+- Baumaschinenmechanik
+bauphysik:
+- Bauphysiker
+- Bauphysikerin
+- Bauphysik
+bestattung:
+- Bestatter
+- Bestatterin
+- Bestattungswesen
+betreuung:
+- Fachmann Betreuung
+- Fachfrau Betreuung
+- Fachperson Betreuung
+betrieb:
+- Betriebsökonom
+- Betriebsökonomin
+- Betriebsökonomie
+bildungsmanagement:
+- Bildungsmanager
+- Bildungsmanagerin
+- Bildungsmanagement
+biochemie:
+- Biochemiker
+- Biochemikerin
+- Biochemie
+buehnentaz:
+- Bühnentänzer
+- Bühnentänzerin
+- Bühnentanz
+chemie:
+- Chemiker
+- Chemikerin
+- Chemie
+choreografie:
+- Choreograf
+- Choreografin
+- Choreografie
+coiffeur:
+- Coiffeur
+- Coiffeuse
+- Hair Stylist
+confiserie:
+- Confiseur
+- Confiseurin
+- Confiserie
+dach:
+- Dachdecker
+- Dachdeckerin
+- Fachkraft Dacharbeiten
+detailhandel:
+- Detailhandelsfachmann
+- Detailhandelsfachfrau
+- Detailhandelsfachperson
+diplomatik:
+- Diplomat
+- Diplomatin
+- Diplomatischer Dienst
+disponie:
+- Disponent
+- Disponentin
+- Disponie
+dramaturgie:
+- Dramaturg
+- Dramaturgin
+- Dramaturgie
+drogerie:
+- Drogist
+- Drogistin
+- Drogeriefachkraft
+elektroingenieur:
+- Elektroingenieur
+- Elektroingenieurin
+- Elektroingenieurwesen
+elektroninstallation:
+- Elektroinstallateur
+- Elektroinstallateurin
+- Elektroinstallation
+ernaehrung:
+- Ernährungsberater
+- Ernährungsberaterin
+- Ernährungsberatung
+facility:
+- Facility Manager
+- Facility Managerin
+- Facility Management
+fahrlehrperson:
+- Fahrlehrer
+- Fahrlehrerin
+- Fahrlehrperson
+finanzplanung:
+- Finanzplaner
+- Finanzplanerin
+- Finanzplanung
+fischzucht:
+- Fischzüchter
+- Fischzüchterin
+- Fischzucht
+floristik:
+- Florist
+- Floristin
+- Floristik
+flugbegleitung:
+- Flugbegleiter
+- Flugbegleiterin
+- Flight Attendant
+forstwirtschaft:
+- Förster
+- Försterin
+- Forstwirtschaft
+fotografie:
+- Fotograf
+- Fotografin
+- Fotografie
+gebaeudereinigung:
+- Gebäudereiniger
+- Gebäudereinigerin
+- Gebäudereinigung
+gebaeudetechnik:
+- Gebäudetechniker
+- Gebäudetechnikerin
+- Gebäudetechnik
+gefaengnis:
+- Gefängnisaufseher
+- Gefängnisaufseherin
+- Gefängnisaufsicht
+geografie:
+- Geograf
+- Geografin
+- Geografie
+geomatik:
+- Geomatiker
+- Geomatikerin
+- Geomatik
+germanistik:
+- Germanist
+- Germanistin
+- Germanistik
+gesundheit:
+- Fachmann Gesundheit
+- Fachfrau Gesundheit
+- Fachperson Gesundheit
+grafikdesign:
+- Grafik-Designer
+- Grafik-Designerin
+- Grafik-Design
+grundbuch:
+- Grundbuchverwalter
+- Grundbuchverwalterin
+- Grundbuchverwaltung
+gynaekologie:
+- Gynäkologe
+- Gynäkologin
+- Gynäkologie
+heizung:
+- Heizungsinstallateur
+- Heizungsinstallateurin
+- Heizunsinstallation
+hochschulassistenz:
+- Hochschulassistent
+- Hochschulassistentin
+- Hochschulassistenz
+hr:
+- HR-Fachmann
+- HR-Fachfrau
+- HR-Fachperson
+humanbiologie:
+- Humanbiologe
+- Humanbiologin
+- Humanbiologie
+immobilien:
+- Immobilienmakler
+- Immobilienmaklerin
+- Immobilien
 informatik:
-    - informatiker
-    - informatikerin
-    - informatik
-lehrer:
-    - Lehrer
-    - Lehrerin
-    - Lehrperson
+- Informatiker
+- Informatikerin
+- Informatik
+innenarchitektur:
+- Innenarchitekt
+- Innenarchitektin
+- Innenarchitektur
+kaufleute:
+- Kaufmann
+- Kauffrau
+- Kaufleute
+koch:
+- Koch
+- Köchin
+- Küchenpersonal
+kosmetik:
+- Kosmetiker
+- Kosmetikerin
+- Kosmetik
+kostueme:
+- Kostümbildner
+- Kostümbilderin
+- Kostümbild
+kriminalwissenschaft:
+- Kriminalwissenschaftler
+- Kriminalwissenschaftlerin
+- Kriminalwissenschaft
+kundendienst:
+- Kundendienstberater
+- Kundendienstberaterin
+- Kundendienstberatung
+kunsttherapie:
+- Kunsttherapeut
+- Kunsttherapeutin
+- Kunsttherapie
+kuration:
+- Kurator
+- Kuratorin
+- Kuration
+labor:
+- Laborant
+- Laborantin
+- Laborfachkraft
+lackierung:
+- Lackierfachmann
+- Lackierfachfrau
+- Lackierfachperson
+laufbahnberatung:
+- Laufbahnberater
+- Laufbahnberaterin
+- Laufbahnberatung
+lebensmittelingenieur:
+- Lebenmittelingenieur
+- Lebensmittelingenieurin
+- Lebensmittelingenieurwesen
+lebensmitteltechnologie:
+- Lebensmitteltechnologe
+- Lebensmitteltechnologin
+- Lebensmitteltechnologie
+lehrperson:
+- Lehrer
+- Lehrerin
+- Lehrperson
+logistik:
+- Logistiker
+- Logistikerin
+- Logistik
+logopaedie:
+- Logopäde
+- Logopädin
+- Logopädie
+maler:
+- Maler
+- Malerin
+- Malerfachkraft
+marketingmanagement:
+- Marketingmanager
+- Marketingmanagerin
+- Marketingmanagement
+maschinenbau:
+- Maschinenbautechniker
+- Maschinenbautechikerin
+- Maschinenbautechnik
+maschineningenieur:
+- Maschineningenieur
+- Maschineningenieurin
+- Maschineningenieurwesen
+maurer:
+- Maurer
+- Maurerin
+mechanik:
+- Mechaniker
+- Mechanikerin
+- Mechanikfachkraft
+mediamatik:
+- Mediamatiker
+- Mediamatikerin
+- Mediamatik
+metallbau:
+- Metallbauer
+- Metallbauerin
+- Metallbau
+motorradmechanik:
+- Motorradmechaniker
+- Motorradmechanikerin
+- Motorradmechanik
+orthopaedie:
+- Orthopädist
+- Orthopädistin
+- Orthopädie
+patentrecht:
+- Patentanwalt
+- Patentanwältin
+- Patentrecht
+pilot:
+- Pilot
+- Pilotin
+podologie:
+- Podologe
+- Podologin
+- Podologie
+polizei:
+- Polizist
+- Polizistin
+- Polizei
+polymechanik:
+- Polymechaniker
+- Polymechanikerin
+- Polymechanik
+produktdesign:
+- Produktdesinger
+- Produktdesignerin
+- Produktdesign
+prozesstechnik:
+- Prozesstechniker
+- Prozesstechnikerin
+- Prozesstechnik
+psychiatrie:
+- Psychiater
+- Psychiaterin
+- Psychiatrie
+psychologie:
+- Psychologe
+- Psychologin
+- Psychologie
+psychotherapie:
+- Psychotherapeut
+- Psychotherapeutin
+- Psychotherapie
+raumausstattung:
+- Raumausstatter
+- Raumausstatterin
+- Raumausstattung
+raumplanung:
+- Raumplaner
+- Raumplanerin
+- Raumplanung
+reiseleitung:
+- Reiseleiter
+- Reiseleiterin
+- Reiseleitung
+restaurant:
+- Restaurantfachmann
+- Restaurantfachfrau
+- Restaurantfachperson
+risikomanagement:
+- Risikomanager
+- Risikomanagerin
+- Risikomanagement
+schneesport:
+- Schneesportlehrer
+- Schneesportlehrerin
+- Schneesportlehrperson
+schreiner:
+- Schreiner
+- Schreinerin
+- Schreinerfachkraft
+sekretaer:
+- Sektretär
+- Sekretärin
+- Büroassistenz
+solarinstallation:
+- Solarinstallateur
+- Solarinstallateurin
+- Solarinstallation
+sozialarbeit:
+- Sozialarbeiter
+- Sozialarbeiterin
+- Fachkraft Sozialarbeit
+sozialpaedagogik:
+- Sozialpädagoge
+- Sozialpädagogin
+- Sozialpädagogik
+sportlehrperson:
+- Sportlehrer
+- Sportlehrerin
+- Sportlehrperson
+statistik:
+- Statistiker
+- Statistikerin
+- Statistikfachperson
+supplychain:
+- Supply Chain Manager
+- Supply Chain Managerin
+- Supply Chain Management
+tatortreinigung:
+- Tatortreiniger
+- Tatortreinigerin
+- Tatortreinigung
+tontechnik:
+- Tontechniker
+- Tontechinkerin
+- Tontechnik
+tourismus:
+- Tourismusfachmann
+- Tourismusfachfrau
+- Tourismusfachperson
+uebersetzung:
+- Übersetzer
+- Übersetzerin
+- Übersetzung
+umweltingenieur:
+- Umweltingenieur
+- Umweltingenieurin
+- Umweltingenieurwesen
+veranstaltungsfachperson:
+- Veranstaltungsfachmann
+- Veranstaltungsfachfrau
+- Veranstaltungsfachperson
+verkaufsleitung:
+- Verkaufsleiter
+- Verkaufsleiterin
+- Verkaufsleitung
+verkehrsingenieur:
+- Verkehrsingenieur
+- Verkehrsingenieurin
+- Verkehrsingenieurwesen
+versicherung:
+- Versicherungsberater
+- Versicherungsberaterin
+- Versicherungsberatung
+vieheinkauf:
+- Vieheinkäufer
+- Vieheinkäuferin
+- Vieheinkaufswesen
+volkswirtschaft:
+- Volkswirtschaftler
+- Volkswirtschaftlerin
+- Volkswirtschaft
+webdesign:
+- Web-Designer
+- Web-Designerin
+- Web-Design
+wirtschaftsingenieur:
+- Wirtschaftsingenieur
+- Wirtschaftsingenieurin
+- Wirtschaftsingenieurwesen
+zimmermann:
+- Zimmermann
+- Zimmerin
+- Zimmerer

@@ -6,6 +6,9 @@ import os.path
 import urllib.parse
 import time
 
+# Define cooldown time
+COOLDOWN_TIME = 0
+
 start_time = time.time()
 
 # Our scraper "interface" and our CSV fieldnames
@@ -29,7 +32,7 @@ KEYWORD_GROUPS = yaml.safe_load(open("input/keywords.yml"))
 
 # create output files
 for group in KEYWORD_GROUPS:
-    filepath = f"ouput/{group}.csv"
+    filepath = f"output/{group}.csv"
     if not os.path.isfile(filepath):
         print(f'Filepath "{filepath}" not found! Creating...')
         csv.DictWriter(open(filepath, "a"), fieldnames).writeheader()
@@ -39,7 +42,7 @@ for group in KEYWORD_GROUPS:
 previous_progress = {"keywords": set(), "sites": set()}
 for group in KEYWORD_GROUPS:
     # Read the CSV file
-    with open(f"ouput/{group}.csv", mode="r") as file:
+    with open(f"output/{group}.csv", mode="r") as file:
         reader = csv.DictReader(file)
         for row in reader:
             previous_progress["keywords"].add(row["keyword"])
@@ -48,7 +51,7 @@ for group in KEYWORD_GROUPS:
 # for nice output
 statistics = {"total": 0, "success": 0, "failed": 0}
 
-# loop trough it (using tqdm to show process)
+# loop through it (using tqdm to show process)
 # a good thing is, when we always go one site after the other, we automatically have some cooldown
 group_progress = tqdm(KEYWORD_GROUPS, desc="Group")
 for group in group_progress:
@@ -62,7 +65,7 @@ for group in group_progress:
         for SC in scraper_progress:
             statistics["total"] += 1
 
-            # changes scraper type from unknonw to our interface
+            # changes scraper type from unknown to our interface
             scraper: Scraper = SC(group_progress.write, CONFIG)
 
             keyword_progress.set_postfix_str(scraper.NAME)
@@ -88,7 +91,7 @@ for group in group_progress:
                 group_progress.write(
                     f"Code: {pages_response.status_code} Message: {pages_response.reason}."
                 )
-                open("ouput/error.log", "a").write(
+                open("output/error.log", "a").write(
                     f"{time.strftime("%Y-%m-%d %H:%M:%S")}\tERROR! While getting page count with  '{keyword}' on  '{scraper.NAME}'. Code: {pages_response.status_code} Message:  {pages_response.reason}.\n"
                 )
                 # just continue, ideally we will just be able to re-run later.
@@ -98,7 +101,7 @@ for group in group_progress:
             total_rows = []
             for page in trange(1, pages + 1, desc="Page", leave=False):
                 # wait a bit before next page
-                time.sleep(2)
+                time.sleep(COOLDOWN_TIME)
 
                 # does the request (the keyword has to be url safe)
                 response = scraper.fetch(urllib.parse.quote(keyword), page)
@@ -111,11 +114,11 @@ for group in group_progress:
                     group_progress.write(
                         f"Code: {response.status_code} Message: {response.reason}."
                     )
-                    open("ouput/error.log", "a").write(
+                    open("output/error.log", "a").write(
                         f"{time.strftime("%Y-%m-%d %H:%M:%S")}\tERROR! While getting  '{keyword}' on  '{scraper.NAME}'  on page {page} of {pages}. Code: {response.status_code} Message:  {response.reason}.\n"
                     )
                     # as the scrape is not complete we have to abort...
-                    # Warning LOOSES everything of current keywoard scrape! (by design)
+                    # Warning LOOSES everything of current keyword scrape! (by design)
                     break
 
                 # parses using beautifulsoup
@@ -133,7 +136,7 @@ for group in group_progress:
                 total_rows.extend(page_rows)
 
             # when ALL pages scraped store to csv
-            csv.DictWriter(open(f"ouput/{group}.csv", "a"), fieldnames).writerows(
+            csv.DictWriter(open(f"output/{group}.csv", "a"), fieldnames).writerows(
                 total_rows
             )
 

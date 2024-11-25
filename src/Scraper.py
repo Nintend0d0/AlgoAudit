@@ -34,13 +34,16 @@ fieldnames = [
     "page",
     "total pages",
     # in scraper
+    "job ad id",
     "amount found",
     "rank",
     "ad",
     "title",
     "pensum string",
-    "pensum pertencage",
+    "pensum percentage",
     "release date",
     "locations",
     "employer",
+    "salary",
+    "description",
 ]
