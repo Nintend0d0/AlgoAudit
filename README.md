@@ -45,5 +45,7 @@ python main.py
 ### Using Conda (recommended)
 
 ```sh
-# TODO
+conda activate ./envs
+cd evaluation/ # important
+python <python_file> # hamming.py or company_numbery.py or job_numbers.py
 ```
