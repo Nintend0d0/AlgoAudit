@@ -1,6 +1,7 @@
 import os
 from itertools import combinations
 import csv
+import yaml
 import pandas as pd
 import plotly.express as px
 
@@ -21,12 +22,14 @@ for csv_file in csv_files:
     # for csv_file in ["informatik.csv"]:
     df = pd.read_csv(f"input/{csv_file}")
 
+    group = csv_file.split(".")[0]
+
     sites = df["site"].unique()
 
     for site in sites:
         site_df = df.loc[(df["site"] == site)]
 
-        total_unique_jobs.setdefault(csv_file, {})[site] = set(
+        total_unique_jobs.setdefault(group, {})[site] = set(
             site_df["job ad id"].unique()
         )
 
@@ -107,20 +110,42 @@ if True:
 
 # *** Visualize
 if True:
-    for site, keywords in unique_jobs.items():
-        keywords_iter = iter(keywords.items())
-        for keyword, job_ids in keywords_iter:
-            x, y = [], []
-            for _ in range(3):
-                x.append(keyword)
-                y.append(len(job_ids))
-                keyword, job_ids = next(keywords_iter)
 
-            fig = px.bar(x=x, y=y)
-            fig.update_layout({"xaxis_title": "Job", "yaxis_title": "Count"})
-            fig.write_image(
-                f"output/{site.replace(".", "-")}_{"+".join(map(lambda s: s.replace(" ", "-"), x))}.png"
+    KEYWORD_GROUPS = yaml.safe_load(open("input/keywords.yml"))
+
+    for group in KEYWORD_GROUPS:
+        if group not in total_unique_jobs:
+            continue
+
+        all_sites = set(unique_jobs.keys()) | set(intersect_jobs.keys())
+
+        for site in all_sites:
+            x_data = []
+            y_data = []
+
+            # total jobs per site
+            x_data.append(f"Total")
+            y_data.append(len(total_unique_jobs[group].get(site, {})))
+
+            # unique jobs per keyword
+            for keyword in KEYWORD_GROUPS[group]:
+                x_data.append(keyword)
+                y_data.append(len(unique_jobs[site].get(keyword, {})))
+
+            # Intersect jobs
+            for pair in combinations(KEYWORD_GROUPS[group], 2):
+                keyword, other_keyword = pair
+                x_data.append(f"{keyword} ∩ {other_keyword}")
+                y_data.append(len(intersect_jobs[site].get(pair, {})))
+
+            assert len(x_data) == len(y_data), "X and Y data not of same length."
+
+            fig = px.bar(x=x_data, y=y_data, text=y_data)
+            fig.update_layout(
+                {
+                    "title": f"{group.capitalize()} on {site}",
+                    "xaxis_title": "Job",
+                    "yaxis_title": "Count",
+                }
             )
-
-
-# FIXME: Job-groups are messed up!
+            fig.write_image(f"output/{site.replace(".", "-")}_{group}.png")
