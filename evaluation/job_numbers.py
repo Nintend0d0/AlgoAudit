@@ -1,9 +1,11 @@
 import os
 from itertools import combinations
+from functools import reduce
 import csv
+from numpy import tile
 import yaml
 import pandas as pd
-import plotly.express as px
+from plotly import graph_objs as go
 
 # *** Prepare Data
 
@@ -16,7 +18,7 @@ for file in os.listdir("input/"):
 # all the interesting values
 total_unique_jobs: dict[str, dict[str, set[str]]] = {}
 unique_jobs: dict[str, dict[str, set[str]]] = {}
-intersect_jobs: dict[str, dict[tuple[str, str], set[str]]] = {}
+intersect_jobs: dict[str, dict[tuple[str, str] | tuple[str, str, str], set[str]]] = {}
 
 for csv_file in csv_files:
     # for csv_file in ["informatik.csv"]:
@@ -53,6 +55,22 @@ for csv_file in csv_files:
                 site_df.loc[site_df["keyword"] == other_keyword]["job ad id"].unique()
             )
             intersect_jobs.setdefault(site, {})[pair] = job_ids.intersection(other_jobs)
+
+        if len(keywords) == 3:
+            job_ids = (
+                set(site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique())
+                for keyword in keywords
+            )
+
+            def reducer(prev: set, current: set) -> set:
+                if prev:
+                    return prev.intersection(current)
+                return current
+
+            triplet = tuple(keywords)
+            intersect_jobs.setdefault(site, {})[tuple(keywords)] = reduce(
+                reducer, job_ids
+            )
 
 
 # *** print summary
@@ -104,8 +122,19 @@ if True:
 
         for site, keywords in intersect_jobs.items():
             for keyword_pair, job_ids in keywords.items():
-                keyword, other_keyword = keyword_pair
-                writer.writerow([site, f"{keyword} ∩ {other_keyword}", len(job_ids)])
+                if len(keyword_pair) == 3:
+                    writer.writerow(
+                        [
+                            site,
+                            f"{keyword_pair[0]} ∩ {keyword_pair[1]} ∩ {keyword_pair[2]}",
+                            len(job_ids),
+                        ]
+                    )
+                else:
+                    keyword, other_keyword = keyword_pair
+                    writer.writerow(
+                        [site, f"{keyword} ∩ {other_keyword}", len(job_ids)]
+                    )
 
 
 # *** Visualize
@@ -120,32 +149,60 @@ if True:
         all_sites = set(unique_jobs.keys()) | set(intersect_jobs.keys())
 
         for site in all_sites:
-            x_data = []
-            y_data = []
+            bars: list[go.Bar] = []
 
             # total jobs per site
-            x_data.append(f"Total")
-            y_data.append(len(total_unique_jobs[group].get(site, {})))
+            bars.append(
+                go.Bar(
+                    y=[len(total_unique_jobs[group].get(site, {}))],
+                    text=[len(total_unique_jobs[group].get(site, {}))],
+                    name="Total",
+                )
+            )
 
             # unique jobs per keyword
             for keyword in KEYWORD_GROUPS[group]:
-                x_data.append(keyword)
-                y_data.append(len(unique_jobs[site].get(keyword, {})))
+                bars.append(
+                    go.Bar(
+                        y=[len(unique_jobs[site].get(keyword, {}))],
+                        text=[len(unique_jobs[site].get(keyword, {}))],
+                        name=keyword,
+                    )
+                )
 
             # Intersect jobs
             for pair in combinations(KEYWORD_GROUPS[group], 2):
                 keyword, other_keyword = pair
-                x_data.append(f"{keyword} ∩ {other_keyword}")
-                y_data.append(len(intersect_jobs[site].get(pair, {})))
 
-            assert len(x_data) == len(y_data), "X and Y data not of same length."
+                bars.append(
+                    go.Bar(
+                        y=[len(intersect_jobs[site].get(pair, {}))],
+                        text=[len(intersect_jobs[site].get(pair, {}))],
+                        name=f"{keyword} ∩ {other_keyword}",
+                    )
+                )
 
-            fig = px.bar(x=x_data, y=y_data, text=y_data)
-            fig.update_layout(
-                {
-                    "title": f"{group.capitalize()} on {site}",
-                    "xaxis_title": "Job",
-                    "yaxis_title": "Count",
-                }
+            all_intersection = tuple(KEYWORD_GROUPS[group])
+            if len(all_intersection) == 3:
+
+                bars.append(
+                    go.Bar(
+                        y=[len(intersect_jobs[site].get(all_intersection, {}))],
+                        text=[len(intersect_jobs[site].get(all_intersection, {}))],
+                        name=f"{all_intersection[0]} ∩ {all_intersection[1]} ∩ {all_intersection[2]}",
+                    )
+                )
+
+            if bars:
+                bars.sort(key=lambda x: x.y[0], reverse=True)  # type: ignore
+
+            fig = go.Figure(
+                data=bars,
+                layout=go.Layout(
+                    title=f"{group.capitalize()} on {site}",
+                    xaxis=go.layout.XAxis(visible=False),
+                    yaxis=go.layout.YAxis(title="Count"),
+                    barmode="overlay",
+                ),
             )
             fig.write_image(f"output/{site.replace(".", "-")}_{group}.png")
