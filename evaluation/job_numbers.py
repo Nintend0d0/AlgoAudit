@@ -7,6 +7,11 @@ import yaml
 import pandas as pd
 from plotly import graph_objs as go
 
+# Job manifest
+DO_PRINT_SUMMARY = False
+DO_CSV_SUMMARY = True
+DO_VISUALIZE = True
+
 # *** Prepare Data
 
 # get all csv files
@@ -74,7 +79,7 @@ for csv_file in csv_files:
 
 
 # *** print summary
-if False:
+if DO_PRINT_SUMMARY:
     print("# Unique jobs per file")
     for csv_file, sites in total_unique_jobs.items():
         print(f"\n## {csv_file}")
@@ -96,7 +101,7 @@ if False:
 
 
 # *** csv summary
-if True:
+if DO_CSV_SUMMARY:
     with open(f"output/unique_jobs_per_file.csv", "w") as file:
         writer = csv.writer(file)
 
@@ -138,7 +143,7 @@ if True:
 
 
 # *** Visualize
-if True:
+if DO_VISUALIZE:
 
     KEYWORD_GROUPS = yaml.safe_load(open("input/keywords.yml"))
 
@@ -152,6 +157,7 @@ if True:
             bars: list[go.Bar] = []
 
             # total jobs per site
+            """
             bars.append(
                 go.Bar(
                     y=[len(total_unique_jobs[group].get(site, {}))],
@@ -159,6 +165,7 @@ if True:
                     name="Total",
                 )
             )
+            """
 
             # unique jobs per keyword
             for keyword in KEYWORD_GROUPS[group]:
@@ -193,8 +200,10 @@ if True:
                     )
                 )
 
+            """
             if bars:
                 bars.sort(key=lambda x: x.y[0], reverse=True)  # type: ignore
+            """
 
             fig = go.Figure(
                 data=bars,
@@ -202,7 +211,7 @@ if True:
                     title=f"{group.capitalize()} on {site}",
                     xaxis=go.layout.XAxis(visible=False),
                     yaxis=go.layout.YAxis(title="Count"),
-                    barmode="overlay",
+                    barmode="stack",
                 ),
             )
             fig.write_image(f"output/{site.replace(".", "-")}_{group}.png")
