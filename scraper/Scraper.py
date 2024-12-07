@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Tuple
 import requests
+import re
 
 
 class Scraper(ABC):

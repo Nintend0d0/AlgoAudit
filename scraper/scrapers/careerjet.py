@@ -1,3 +1,5 @@
+import re
+
 from Scraper import Scraper
 from typing import Tuple
 import requests
@@ -10,17 +12,16 @@ import math
 class Careerjet(Scraper):
 
     NAME = "careerjet.ch"
-    URL_TEMPLATE = "https://www.careerjet.ch/stellenangebote?s={keyword}&l={location}&p={page}"
-
+    URL_TEMPLATE = "https://www.careerjet.ch/stellenangebote?s={keyword}&p={page}"
+    URL_LOC_TEMPLATE = "https://www.careerjet.ch/stellenangebote?s={keyword}&l={location}&p={page}"
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 
     def pages(self, keyword: str) -> Tuple[int, requests.Response]:
-        response = requests.get(
-            self.URL_TEMPLATE.format(
-                keyword=keyword, location=self.config["location"]["name"], page=1
-            ),
-            headers={"User-Agent": self.user_agent},
-        )
+        if self.config["use_location"]:
+            url = self.URL_LOC_TEMPLATE.format(keyword=keyword, location=self.config["location"]["name"], page=1)
+        else:
+            url = self.URL_TEMPLATE.format(keyword=keyword, page=1)
+        response = requests.get(url=url, headers={"User-Agent": self.user_agent})
 
         site = BeautifulSoup(response.text, "html.parser")
 
@@ -30,19 +31,20 @@ class Careerjet(Scraper):
             self.write(f"No results found for {keyword}")
             pages = 0
         else:
-            number_of_jobs_text = number_of_jobs_span.get_text().strip()
-            number_of_jobs = int(number_of_jobs_text.split(" ")[0])
-            pages = math.ceil(number_of_jobs / 20)
+            number_of_jobs_text = number_of_jobs_span.get_text().strip().split(" ")[0]
+            amount_found = int(re.sub(r'\D', '', number_of_jobs_text))
+            pages = math.ceil(amount_found / 20)
 
         return pages, response
 
+
     def fetch(self, keyword: str, page: int) -> requests.Response:
-        return requests.get(
-            self.URL_TEMPLATE.format(
-                keyword=keyword, location=self.config["location"]["name"], page=page
-            ),
-            headers={"User-Agent": self.user_agent},
-        )
+        if self.config["use_location"]:
+            url = self.URL_LOC_TEMPLATE.format(keyword=keyword, location=self.config["location"]["name"], page=page)
+        else:
+            url = self.URL_TEMPLATE.format(keyword=keyword, page=1)
+        return requests.get(url=url, headers={"User-Agent": self.user_agent})
+
 
     def parse(self, html: str) -> list[dict]:
         result = []
@@ -55,8 +57,8 @@ class Careerjet(Scraper):
         if number_of_jobs_span is None:
             raise RuntimeError("careerjet.ch number of jobs selector not correct anymore.")
 
-        number_of_jobs_text = number_of_jobs_span.get_text().strip()
-        amount_found = int(number_of_jobs_text.split(" ")[0])
+        number_of_jobs_text = number_of_jobs_span.get_text().strip().split(" ")[0]
+        amount_found = int(re.sub(r'\D', '', number_of_jobs_text))
 
         # get all search results plus advertisement
         jobs = site.select(
