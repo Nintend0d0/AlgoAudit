@@ -42,6 +42,32 @@ for csv_file in csv_files:
 
         keywords = site_df["keyword"].unique()
 
+        # Determine job ad ids for each search term
+        results_per_keyword: dict[str, set[str]] = {}
+        for keyword in keywords:
+            results_per_keyword.setdefault(keyword, set(
+                site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique()
+            ))
+
+        # Determine which job ad was returned for which keyword(s) by applying set theory.
+        # 1) Job ads returned for one keyword only:
+        for keyword in keywords:
+            all_sets = [res for kw, res in results_per_keyword.items() if kw != keyword]
+            all_sets.insert(0, results_per_keyword[keyword])
+            unique_jobs.setdefault(site, {})[keyword] = reduce(lambda a, b: a - b, all_sets)
+        # 2) Job ads returned for exactly 2 keywords:
+        for keyword_set in combinations(results_per_keyword, 2):
+            all_sets = [res for kw, res in results_per_keyword.items() if kw not in keyword_set]
+            all_sets.insert(0, results_per_keyword[keyword_set[0]]
+                            .intersection(results_per_keyword[keyword_set[1]]))
+            intersect_jobs.setdefault(site, {})[keyword_set] = reduce(lambda a, b: a - b, all_sets)
+        # 3) Job ads returned for all keywords:
+        if len(keywords) == 3:
+            intersect_jobs.setdefault(site, {})[tuple(keywords)] = (
+                reduce(lambda a, b: a.intersection(b), results_per_keyword.values())
+            )
+
+        """
         for keyword in keywords:
             job_ids = set(
                 site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique()
@@ -76,6 +102,7 @@ for csv_file in csv_files:
             intersect_jobs.setdefault(site, {})[tuple(keywords)] = reduce(
                 reducer, job_ids
             )
+        """
 
 
 # *** print summary
@@ -102,7 +129,7 @@ if DO_PRINT_SUMMARY:
 
 # *** csv summary
 if DO_CSV_SUMMARY:
-    with open(f"output/unique_jobs_per_file.csv", "w") as file:
+    with open(f"output/jobs_per_group.csv", "w") as file:
         writer = csv.writer(file)
 
         writer.writerow(["file", "site", "count"])
@@ -111,35 +138,18 @@ if DO_CSV_SUMMARY:
             for site, job_ids in sites.items():
                 writer.writerow([csv_file, site, len(job_ids)])
 
-    with open(f"output/unique_jobs.csv", "w") as file:
+    with open(f"output/jobs_per_keyword_combination.csv", "w") as file:
         writer = csv.writer(file)
 
-        writer.writerow(["site", "keyword", "count"])
+        writer.writerow(["file", "site", "count"])
 
         for site, keywords in unique_jobs.items():
             for keyword, job_ids in keywords.items():
                 writer.writerow([site, keyword, len(job_ids)])
 
-    with open(f"output/intersect_jobs.csv", "w") as file:
-        writer = csv.writer(file)
-
-        writer.writerow(["site", "keyword", "count"])
-
         for site, keywords in intersect_jobs.items():
             for keyword_pair, job_ids in keywords.items():
-                if len(keyword_pair) == 3:
-                    writer.writerow(
-                        [
-                            site,
-                            f"{keyword_pair[0]} ∩ {keyword_pair[1]} ∩ {keyword_pair[2]}",
-                            len(job_ids),
-                        ]
-                    )
-                else:
-                    keyword, other_keyword = keyword_pair
-                    writer.writerow(
-                        [site, f"{keyword} ∩ {other_keyword}", len(job_ids)]
-                    )
+                writer.writerow([site, " ∩ ".join(keyword_pair), len(job_ids)])
 
 
 # *** Visualize
@@ -169,34 +179,34 @@ if DO_VISUALIZE:
 
             # unique jobs per keyword
             for keyword in KEYWORD_GROUPS[group]:
+                n = len(unique_jobs[site].get(keyword, {}))
                 bars.append(
                     go.Bar(
-                        y=[len(unique_jobs[site].get(keyword, {}))],
-                        text=[len(unique_jobs[site].get(keyword, {}))],
-                        name=keyword,
+                        y=[n],
+                        text=[n],
+                        name=f"{keyword} ({n})",
                     )
                 )
 
             # Intersect jobs
             for pair in combinations(KEYWORD_GROUPS[group], 2):
-                keyword, other_keyword = pair
-
+                n = len(intersect_jobs[site].get(pair, {}))
                 bars.append(
                     go.Bar(
-                        y=[len(intersect_jobs[site].get(pair, {}))],
-                        text=[len(intersect_jobs[site].get(pair, {}))],
-                        name=f"{keyword} ∩ {other_keyword}",
+                        y=[n],
+                        text=[n],
+                        name=" ∩ ".join(pair) + f" ({n})",
                     )
                 )
 
             all_intersection = tuple(KEYWORD_GROUPS[group])
             if len(all_intersection) == 3:
-
+                n = len(intersect_jobs[site].get(all_intersection, {}))
                 bars.append(
                     go.Bar(
-                        y=[len(intersect_jobs[site].get(all_intersection, {}))],
-                        text=[len(intersect_jobs[site].get(all_intersection, {}))],
-                        name=f"{all_intersection[0]} ∩ {all_intersection[1]} ∩ {all_intersection[2]}",
+                        y=[n],
+                        text=[n],
+                        name=" ∩ ".join(all_intersection) + f" ({n})",
                     )
                 )
 
