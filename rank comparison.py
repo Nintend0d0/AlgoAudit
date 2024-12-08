@@ -6,25 +6,37 @@ import os
 import matplotlib
 matplotlib.use('Agg')
 
-# specify folder containing csv files (insert own folderpath pls)
-folder_path = r"" # TODO: insert folderpath where scraping output is saved and rank comparison graphs should be saved
-file_list = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+# specify folder containing csv files (insert own folder paths pls)
+input_folder_path = r"correlations/input" # TODO: insert folder path where scraping output (= input for this) is saved
+output_folder_path = r"correlations" # TODO: insert folder path where rank comparison graphs should be saved
+
+KENDAL_PATH = os.path.join(output_folder_path, "correlation/kendall")
+SPEARMAN_PATH = os.path.join(output_folder_path, "correlation/spearman")
+SCATTER_PATH = os.path.join(output_folder_path, "scatter")
+# create output folders if they do not exist
+os.makedirs(KENDAL_PATH, exist_ok=True)
+os.makedirs(SPEARMAN_PATH, exist_ok=True)
+os.makedirs(SCATTER_PATH, exist_ok=True)
 
 # process each file in the directory
+file_list = [f for f in os.listdir(input_folder_path) if f.endswith('.csv')]
 for file_name in file_list:
-    file_path = os.path.join(folder_path, file_name)
+    job_group = os.path.splitext(file_name)[0]
+    print(f"Plotting stats for {job_group}")
+
+    file_path = os.path.join(input_folder_path, file_name)
     data = pd.read_csv(file_path)
 
     # create output folder named after the csv file for easier overview
-    output_folder = os.path.join(folder_path, os.path.splitext(file_name)[0])
-    os.makedirs(output_folder, exist_ok=True)
+    #output_folder = os.path.join(output_folder_path, job_group)
+    #os.makedirs(output_folder, exist_ok=True)
 
     # extract relevant columns
     columns_of_interest = ['keyword', 'site', 'page', 'job ad id', 'rank']
     data = data[columns_of_interest].dropna(subset=['rank'])
     data['rank'] = pd.to_numeric(data['rank'], errors='coerce')
 
-    # determine number of ads per page 
+    # determine number of ads per page
     ads_per_page = data.groupby(['site', 'page'])['rank'].max().max() + 1
 
     # compute global ranks by site and keyword
@@ -37,10 +49,10 @@ for file_name in file_list:
 
     for site in sites:
         site_data = data[data['site'] == site]
-        
+
         # pivot data for rank correlation
         pivoted = site_data.pivot_table(index=['job ad id'], columns='keyword', values='global_rank')
-        
+
         if pivoted.empty or pivoted.isnull().all().all():
             print(f"skipping site '{site}' in file '{file_name}' due to lack of valid data.")
             continue
@@ -53,16 +65,16 @@ for file_name in file_list:
         plt.figure(figsize=(8, 6))
         sns.heatmap(spearman_corr, annot=True, cmap='coolwarm', cbar=True)
         plt.title(f"spearman rank correlation (global ranks per keyword) - {site}")
-        spearman_path = os.path.join(output_folder, f"{site}_spearman_correlation.png")
-        plt.savefig(spearman_path, bbox_inches='tight')
+        spearman_file = os.path.join(SPEARMAN_PATH, f"{site}_{job_group}-spearman_correlation.png")
+        plt.savefig(spearman_file, bbox_inches='tight')
         plt.close()
 
         # save kendall correlation heatmap
         plt.figure(figsize=(8, 6))
         sns.heatmap(kendall_corr, annot=True, cmap='coolwarm', cbar=True)
         plt.title(f"kendall rank correlation (global ranks per keyword) - {site}")
-        kendall_path = os.path.join(output_folder, f"{site}_kendall_correlation.png")
-        plt.savefig(kendall_path, bbox_inches='tight')
+        kendall_file = os.path.join(KENDAL_PATH, f"{site}_{job_group}-kendall_correlation.png")
+        plt.savefig(kendall_file, bbox_inches='tight')
         plt.close()
 
         # save scatter plots for rank comparison
@@ -87,6 +99,6 @@ for file_name in file_list:
                 plt.axline((x_min, y_min), (x_max, y_max), color='blue', linestyle='dotted', label="true diagonal")
 
                 plt.legend()
-                scatter_path = os.path.join(output_folder, f"{site}_{term1}_vs_{term2}_scatter.png")
-                plt.savefig(scatter_path, bbox_inches='tight')
+                scatter_file = os.path.join(SCATTER_PATH, f"{site}_{job_group}-{term1}_vs_{term2}_scatter.png")
+                plt.savefig(scatter_file, bbox_inches='tight')
                 plt.close()
