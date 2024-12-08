@@ -41,7 +41,7 @@ class Jobs(Scraper):
         if self.config["use_location"]:
             url = self.URL_LOC_TEMPLATE.format(keyword=keyword, location=self.config["location"]["name"], page=page)
         else:
-            url = self.URL_TEMPLATE.format(keyword=keyword, page=1)
+            url = self.URL_TEMPLATE.format(keyword=keyword, page=page)
         return requests.get(url=url, headers={"User-Agent": self.user_agent})
 
 
