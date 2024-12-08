@@ -6,11 +6,17 @@ from numpy import tile
 import yaml
 import pandas as pd
 from plotly import graph_objs as go
+from pathlib import Path
 
 # Job manifest
 DO_PRINT_SUMMARY = False
 DO_CSV_SUMMARY = True
 DO_VISUALIZE = True
+
+# File and folder locations
+KEYWORD_FILE = "input/keywords.yml"
+CSV_OUT_PATH = "output"
+VIZ_OUT_PATH = "output/viz"
 
 # *** Prepare Data
 
@@ -26,7 +32,6 @@ unique_jobs: dict[str, dict[str, set[str]]] = {}
 intersect_jobs: dict[str, dict[tuple[str, str] | tuple[str, str, str], set[str]]] = {}
 
 for csv_file in csv_files:
-    # for csv_file in ["informatik.csv"]:
     df = pd.read_csv(f"input/{csv_file}")
 
     group = csv_file.split(".")[0]
@@ -129,7 +134,8 @@ if DO_PRINT_SUMMARY:
 
 # *** csv summary
 if DO_CSV_SUMMARY:
-    with open(f"output/jobs_per_group.csv", "w") as file:
+    out_filepath = os.path.join(CSV_OUT_PATH, "jobs_per_group.csv")
+    with open(out_filepath, "w") as file:
         writer = csv.writer(file)
 
         writer.writerow(["file", "site", "count"])
@@ -138,7 +144,8 @@ if DO_CSV_SUMMARY:
             for site, job_ids in sites.items():
                 writer.writerow([csv_file, site, len(job_ids)])
 
-    with open(f"output/jobs_per_keyword_combination.csv", "w") as file:
+    out_filepath = os.path.join(CSV_OUT_PATH, "jobs_per_keyword_combination.csv")
+    with open(out_filepath, "w") as file:
         writer = csv.writer(file)
 
         writer.writerow(["file", "site", "count"])
@@ -155,7 +162,10 @@ if DO_CSV_SUMMARY:
 # *** Visualize
 if DO_VISUALIZE:
 
-    KEYWORD_GROUPS = yaml.safe_load(open("input/keywords.yml"))
+    KEYWORD_GROUPS = yaml.safe_load(open(KEYWORD_FILE))
+
+    # Create output folder if necessary
+    Path(VIZ_OUT_PATH).mkdir(parents=True, exist_ok=True)
 
     for group in KEYWORD_GROUPS:
         if group not in total_unique_jobs:
@@ -224,4 +234,6 @@ if DO_VISUALIZE:
                     barmode="stack",
                 ),
             )
-            fig.write_image(f"output/{site.replace(".", "-")}_{group}.png")
+            fig_filename = f"{site.replace(".", "-")}_{group}.png"
+            fig_outfile = os.path.join(VIZ_OUT_PATH, fig_filename)
+            fig.write_image(fig_outfile)
