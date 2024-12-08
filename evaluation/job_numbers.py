@@ -31,6 +31,8 @@ total_unique_jobs: dict[str, dict[str, set[str]]] = {}
 unique_jobs: dict[str, dict[str, set[str]]] = {}
 intersect_jobs: dict[str, dict[tuple[str, str] | tuple[str, str, str], set[str]]] = {}
 
+KEYWORD_GROUPS = yaml.safe_load(open(KEYWORD_FILE))
+
 for csv_file in csv_files:
     df = pd.read_csv(f"input/{csv_file}")
 
@@ -45,7 +47,10 @@ for csv_file in csv_files:
             site_df["job ad id"].unique()
         )
 
-        keywords = site_df["keyword"].unique()
+        # keywords = site_df["keyword"].unique()
+        if group not in KEYWORD_GROUPS:
+            continue
+        keywords = KEYWORD_GROUPS[group]
 
         # Determine job ad ids for each search term
         results_per_keyword: dict[str, set[str]] = {}
@@ -161,8 +166,6 @@ if DO_CSV_SUMMARY:
 
 # *** Visualize
 if DO_VISUALIZE:
-
-    KEYWORD_GROUPS = yaml.safe_load(open(KEYWORD_FILE))
 
     # Create output folder if necessary
     Path(VIZ_OUT_PATH).mkdir(parents=True, exist_ok=True)
