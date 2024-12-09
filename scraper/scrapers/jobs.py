@@ -9,17 +9,17 @@ from bs4 import BeautifulSoup
 class Jobs(Scraper):
 
     NAME = "jobs.ch"
-    URL_TEMPLATE = "https://www.jobs.ch/de/stellenangebote/?location={location}&page={page}&term={keyword}"
+    URL_TEMPLATE = "https://www.jobs.ch/de/stellenangebote/?page={page}&term={keyword}"
+    URL_LOC_TEMPLATE = "https://www.jobs.ch/de/stellenangebote/?location={location}&page={page}&term={keyword}"
 
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 
     def pages(self, keyword: str) -> Tuple[int, requests.Response]:
-        response = requests.get(
-            self.URL_TEMPLATE.format(
-                keyword=keyword, location=self.config["location"]["name"], page=1
-            ),
-            headers={"User-Agent": self.user_agent},
-        )
+        if self.config["use_location"]:
+            url = self.URL_LOC_TEMPLATE.format(keyword=keyword, location=self.config["location"]["name"], page=1)
+        else:
+            url = self.URL_TEMPLATE.format(keyword=keyword, page=1)
+        response = requests.get(url=url, headers={"User-Agent": self.user_agent})
 
         site = BeautifulSoup(response.text, "html.parser")
 
@@ -38,12 +38,12 @@ class Jobs(Scraper):
         return pages, response
 
     def fetch(self, keyword: str, page: int) -> requests.Response:
-        return requests.get(
-            self.URL_TEMPLATE.format(
-                keyword=keyword, location=self.config["location"]["name"], page=page
-            ),
-            headers={"User-Agent": self.user_agent},
-        )
+        if self.config["use_location"]:
+            url = self.URL_LOC_TEMPLATE.format(keyword=keyword, location=self.config["location"]["name"], page=page)
+        else:
+            url = self.URL_TEMPLATE.format(keyword=keyword, page=page)
+        return requests.get(url=url, headers={"User-Agent": self.user_agent})
+
 
     def parse(self, html: str) -> list[dict]:
         result = []

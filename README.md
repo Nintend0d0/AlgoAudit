@@ -15,6 +15,16 @@ conda activate ./envs
 pip install -r requirements.txt
 ```
 
+Depending on your system and configuration, the above commands might not work (e.g. using conda 24.1.0 on a Mac required other commands).
+Try the following instead:
+
+```sh
+conda create -p ./envs python=3.12.\*
+conda activate ./envs
+pip install -r requirements.txt
+```
+
+
 ### VSCode
 
 Copy `settings.json.default` to `settings.json`.
@@ -49,3 +59,11 @@ conda activate ./envs
 cd evaluation/ # important
 python <python_file> # hamming.py or company_numbery.py or job_numbers.py
 ```
+
+### Known Issues
+
+If you encounter the following error when running the evaluation:
+`ValueError: --plotlyjs argument is not a valid URL or file path`
+This is due to a flaw in the Kaleido library.  Remove all spaces and accents in the project path
+(e.g. use `.../Universitaet_Zuerich/...` instead of `.../Universität Zürich/...`)
+

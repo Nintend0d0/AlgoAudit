@@ -6,6 +6,17 @@ from numpy import tile
 import yaml
 import pandas as pd
 from plotly import graph_objs as go
+from pathlib import Path
+
+# Job manifest
+DO_PRINT_SUMMARY = False
+DO_CSV_SUMMARY = True
+DO_VISUALIZE = True
+
+# File and folder locations
+KEYWORD_FILE = "input/keywords.yml"
+CSV_OUT_PATH = "output"
+VIZ_OUT_PATH = "output/viz"
 
 # *** Prepare Data
 
@@ -20,8 +31,9 @@ total_unique_jobs: dict[str, dict[str, set[str]]] = {}
 unique_jobs: dict[str, dict[str, set[str]]] = {}
 intersect_jobs: dict[str, dict[tuple[str, str] | tuple[str, str, str], set[str]]] = {}
 
+KEYWORD_GROUPS = yaml.safe_load(open(KEYWORD_FILE))
+
 for csv_file in csv_files:
-    # for csv_file in ["informatik.csv"]:
     df = pd.read_csv(f"input/{csv_file}")
 
     group = csv_file.split(".")[0]
@@ -35,8 +47,37 @@ for csv_file in csv_files:
             site_df["job ad id"].unique()
         )
 
-        keywords = site_df["keyword"].unique()
+        # keywords = site_df["keyword"].unique()
+        if group not in KEYWORD_GROUPS:
+            continue
+        keywords = KEYWORD_GROUPS[group]
 
+        # Determine job ad ids for each search term
+        results_per_keyword: dict[str, set[str]] = {}
+        for keyword in keywords:
+            results_per_keyword.setdefault(keyword, set(
+                site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique()
+            ))
+
+        # Determine which job ad was returned for which keyword(s) by applying set theory.
+        # 1) Job ads returned for one keyword only:
+        for keyword in keywords:
+            all_sets = [res for kw, res in results_per_keyword.items() if kw != keyword]
+            all_sets.insert(0, results_per_keyword[keyword])
+            unique_jobs.setdefault(site, {})[keyword] = reduce(lambda a, b: a - b, all_sets)
+        # 2) Job ads returned for exactly 2 keywords:
+        for keyword_set in combinations(results_per_keyword, 2):
+            all_sets = [res for kw, res in results_per_keyword.items() if kw not in keyword_set]
+            all_sets.insert(0, results_per_keyword[keyword_set[0]]
+                            .intersection(results_per_keyword[keyword_set[1]]))
+            intersect_jobs.setdefault(site, {})[keyword_set] = reduce(lambda a, b: a - b, all_sets)
+        # 3) Job ads returned for all keywords:
+        if len(keywords) == 3:
+            intersect_jobs.setdefault(site, {})[tuple(keywords)] = (
+                reduce(lambda a, b: a.intersection(b), results_per_keyword.values())
+            )
+
+        """
         for keyword in keywords:
             job_ids = set(
                 site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique()
@@ -71,10 +112,11 @@ for csv_file in csv_files:
             intersect_jobs.setdefault(site, {})[tuple(keywords)] = reduce(
                 reducer, job_ids
             )
+        """
 
 
 # *** print summary
-if False:
+if DO_PRINT_SUMMARY:
     print("# Unique jobs per file")
     for csv_file, sites in total_unique_jobs.items():
         print(f"\n## {csv_file}")
@@ -96,8 +138,9 @@ if False:
 
 
 # *** csv summary
-if True:
-    with open(f"output/unique_jobs_per_file.csv", "w") as file:
+if DO_CSV_SUMMARY:
+    out_filepath = os.path.join(CSV_OUT_PATH, "jobs_per_group.csv")
+    with open(out_filepath, "w") as file:
         writer = csv.writer(file)
 
         writer.writerow(["file", "site", "count"])
@@ -106,41 +149,26 @@ if True:
             for site, job_ids in sites.items():
                 writer.writerow([csv_file, site, len(job_ids)])
 
-    with open(f"output/unique_jobs.csv", "w") as file:
+    out_filepath = os.path.join(CSV_OUT_PATH, "jobs_per_keyword_combination.csv")
+    with open(out_filepath, "w") as file:
         writer = csv.writer(file)
 
-        writer.writerow(["site", "keyword", "count"])
+        writer.writerow(["file", "site", "count"])
 
         for site, keywords in unique_jobs.items():
             for keyword, job_ids in keywords.items():
                 writer.writerow([site, keyword, len(job_ids)])
 
-    with open(f"output/intersect_jobs.csv", "w") as file:
-        writer = csv.writer(file)
-
-        writer.writerow(["site", "keyword", "count"])
-
         for site, keywords in intersect_jobs.items():
             for keyword_pair, job_ids in keywords.items():
-                if len(keyword_pair) == 3:
-                    writer.writerow(
-                        [
-                            site,
-                            f"{keyword_pair[0]} ∩ {keyword_pair[1]} ∩ {keyword_pair[2]}",
-                            len(job_ids),
-                        ]
-                    )
-                else:
-                    keyword, other_keyword = keyword_pair
-                    writer.writerow(
-                        [site, f"{keyword} ∩ {other_keyword}", len(job_ids)]
-                    )
+                writer.writerow([site, " ∩ ".join(keyword_pair), len(job_ids)])
 
 
 # *** Visualize
-if True:
+if DO_VISUALIZE:
 
-    KEYWORD_GROUPS = yaml.safe_load(open("input/keywords.yml"))
+    # Create output folder if necessary
+    Path(VIZ_OUT_PATH).mkdir(parents=True, exist_ok=True)
 
     for group in KEYWORD_GROUPS:
         if group not in total_unique_jobs:
@@ -152,6 +180,7 @@ if True:
             bars: list[go.Bar] = []
 
             # total jobs per site
+            """
             bars.append(
                 go.Bar(
                     y=[len(total_unique_jobs[group].get(site, {}))],
@@ -159,42 +188,45 @@ if True:
                     name="Total",
                 )
             )
+            """
 
             # unique jobs per keyword
             for keyword in KEYWORD_GROUPS[group]:
+                n = len(unique_jobs[site].get(keyword, {}))
                 bars.append(
                     go.Bar(
-                        y=[len(unique_jobs[site].get(keyword, {}))],
-                        text=[len(unique_jobs[site].get(keyword, {}))],
-                        name=keyword,
+                        y=[n],
+                        text=[n],
+                        name=f"{keyword} ({n})",
                     )
                 )
 
             # Intersect jobs
             for pair in combinations(KEYWORD_GROUPS[group], 2):
-                keyword, other_keyword = pair
-
+                n = len(intersect_jobs[site].get(pair, {}))
                 bars.append(
                     go.Bar(
-                        y=[len(intersect_jobs[site].get(pair, {}))],
-                        text=[len(intersect_jobs[site].get(pair, {}))],
-                        name=f"{keyword} ∩ {other_keyword}",
+                        y=[n],
+                        text=[n],
+                        name=" ∩ ".join(pair) + f" ({n})",
                     )
                 )
 
             all_intersection = tuple(KEYWORD_GROUPS[group])
             if len(all_intersection) == 3:
-
+                n = len(intersect_jobs[site].get(all_intersection, {}))
                 bars.append(
                     go.Bar(
-                        y=[len(intersect_jobs[site].get(all_intersection, {}))],
-                        text=[len(intersect_jobs[site].get(all_intersection, {}))],
-                        name=f"{all_intersection[0]} ∩ {all_intersection[1]} ∩ {all_intersection[2]}",
+                        y=[n],
+                        text=[n],
+                        name=" ∩ ".join(all_intersection) + f" ({n})",
                     )
                 )
 
+            """
             if bars:
                 bars.sort(key=lambda x: x.y[0], reverse=True)  # type: ignore
+            """
 
             fig = go.Figure(
                 data=bars,
@@ -202,7 +234,9 @@ if True:
                     title=f"{group.capitalize()} on {site}",
                     xaxis=go.layout.XAxis(visible=False),
                     yaxis=go.layout.YAxis(title="Count"),
-                    barmode="overlay",
+                    barmode="stack",
                 ),
             )
-            fig.write_image(f"output/{site.replace(".", "-")}_{group}.png")
+            fig_filename = f"{site.replace(".", "-")}_{group}.png"
+            fig_outfile = os.path.join(VIZ_OUT_PATH, fig_filename)
+            fig.write_image(fig_outfile)
