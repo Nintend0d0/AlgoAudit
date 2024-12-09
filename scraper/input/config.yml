@@ -1,4 +1,6 @@
 # FUTURE: list for multiple locations
+use_location:
+    false
 location:
     name: Zürich
     distance: 20
