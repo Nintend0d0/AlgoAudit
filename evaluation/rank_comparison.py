@@ -32,7 +32,7 @@ def generalized_kendall_tau(x, y):
     return tau_g
 
 # file paths
-input_folder_path = r"C:\Users\mirja\Downloads\webscraping-output-20241208"
+input_folder_path = "input"
 output_folder_path = "output"
 KENDALL_PATH = os.path.join(output_folder_path, "correlation/kendall")
 SCATTER_PATH = os.path.join(output_folder_path, "scatter")
@@ -102,7 +102,13 @@ for file_name in file_list:
             plt.title(f"Rank Comparison: {term1} vs {term2} - {site}")
             plt.xlabel(f"Global Rank ({term1})")
             plt.ylabel(f"Global Rank ({term2})")
-            plt.axline((0, 0), slope=1, color="red", linestyle="dashed", label="Perfect Agreement")
+            # plot reference lines
+            plt.axline((0, 0), slope=1, color="red", linestyle="dashed", label="perfect agreement")
+            x_min, x_max = plt.gca().get_xlim()
+            y_min, y_max = plt.gca().get_ylim()
+            diag_min = min(x_min, y_min)
+            diag_max = max(x_max, y_max)
+            plt.axline((x_min, y_min), (x_max, y_max), color='blue', linestyle='dotted', label="true diagonal")
             plt.legend()
             scatter_file = os.path.join(
                 SCATTER_PATH, f"{site}_{job_group}_{term1}_vs_{term2}_scatter.png"
