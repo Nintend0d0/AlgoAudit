@@ -32,7 +32,7 @@ def generalized_kendall_tau(x, y):
     return tau_g
 
 # file paths
-input_folder_path = "input"
+input_folder_path = r"C:\Users\mirja\Downloads\webscraping-output-20241208"
 output_folder_path = "output"
 KENDALL_PATH = os.path.join(output_folder_path, "correlation/kendall")
 SCATTER_PATH = os.path.join(output_folder_path, "scatter")
@@ -68,9 +68,9 @@ for file_name in file_list:
         pivoted = site_data.pivot_table(index="job ad id", columns="keyword", values="global_rank")
 
         # skip if fewer than 2 keywords, no sensible comparison possible
-        if pivoted.shape[1] < 2:
+        """if pivoted.shape[1] < 2:
             print(f"Skipping site '{site}' in file '{file_name}' due to insufficient keywords.")
-            continue
+            continue"""
 
         # calculate kendall's tau relevant keyword pairs
         search_terms = pivoted.columns
