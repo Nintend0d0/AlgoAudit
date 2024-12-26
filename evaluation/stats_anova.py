@@ -1,6 +1,10 @@
 import os
 import pingouin as pg
 import pandas as pd
+import warnings
+
+# Suppress warnings for pingouin's pairwise_tests
+warnings.filterwarnings("ignore")
 
 ANOVA_FILE = "output/anova.csv"
 PREPARATION_SCRIPT = "job_distributions.py"
@@ -85,8 +89,10 @@ for site in sites:
         padjust='bonf',
     )
     pairwise['sig'] = pairwise['p-corr'] < 0.05
-    pairwise['effect'] = pairwise['hedges'].apply(lambda h: "small" if abs(h) <= 0.2 else "large" if abs(h) >= 0.8 else "medium")
-    pairwise['dir'] = pairwise['hedges'].apply(lambda h: "<" if h < 0 else ">" if h >= 0 else "=")
+    pairwise['effect'] = pairwise['hedges'].apply(
+        lambda h: "none" if h == 0.0 else "small" if abs(h) <= 0.2 else "large" if abs(h) >= 0.8 else "medium"
+    )
+    pairwise['dir'] = pairwise['hedges'].apply(lambda h: "<" if h < 0 else ">" if h > 0 else "=")
 
     print(pairwise)
 
