@@ -37,7 +37,6 @@ for group in KEYWORD_GROUPS:
         print(f'Filepath "{filepath}" not found! Creating...')
         csv.DictWriter(open(filepath, "a"), fieldnames).writeheader()
 
-# TODO: Check for correctness
 # keep track of progress
 previous_progress = {"keywords": set(), "sites": set()}
 for group in KEYWORD_GROUPS:

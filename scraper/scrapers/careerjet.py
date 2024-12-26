@@ -3,7 +3,7 @@ from typing import Tuple
 import requests
 from bs4 import BeautifulSoup
 import math
-iport re
+import re
 
 # IMPORTANT: Don't use print() use self.write()
 
