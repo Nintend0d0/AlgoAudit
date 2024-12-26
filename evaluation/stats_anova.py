@@ -11,6 +11,10 @@ if not os.path.isfile(ANOVA_FILE):
 # Load stats file
 anova_df = pd.read_csv(ANOVA_FILE)
 
+# Check whether we have more than 2 different groups. If not, we have to skip repeated measures ANOVA.
+groups = anova_df['group'].unique()
+calculate_rm_anova = len(groups) > 2
+
 sites = anova_df['site'].unique()
 for site in sites:
     use_correction = False
@@ -41,33 +45,38 @@ for site in sites:
     # Perform Repeated Measures ANOVA with Greenhouse-Geisser correction if sphericity is violated
     print("\n2) Repeated Measures ANOVA:")
 
-    anova_results = pg.rm_anova(
-        data=site_df,
-        dv='precision',
-        within='category',
-        subject='group',
-        correction=True,
-        detailed=True,
-    )
-    p_unc = anova_results['p-unc'].iloc[0]  # Uncorrected p-value
-    sphericity = anova_results['sphericity'].iloc[0]  # Sphericity of the data (boolean)
-    p_GG_corr = anova_results['p-GG-corr'].iloc[0]  # Greenhouse-Geisser corrected p-value
+    if calculate_rm_anova:
+        anova_results = pg.rm_anova(
+            data=site_df,
+            dv='precision',
+            within='category',
+            subject='group',
+            correction=True,
+            detailed=True,
+        )
+        p_unc = anova_results['p-unc'].iloc[0]  # Uncorrected p-value
+        sphericity = anova_results['sphericity'].iloc[0]  # Sphericity of the data (boolean)
+        p_GG_corr = anova_results['p-GG-corr'].iloc[0]  # Greenhouse-Geisser corrected p-value
 
-    print(anova_results)
+        print(anova_results)
 
-    if sphericity:
-        print("\nSphericity assumption holds.")
-        p = p_unc
+        if sphericity:
+            print("\nSphericity assumption holds.")
+            p = p_unc
+        else:
+            print("\nSphericity is violated => apply correction.")
+            p = p_GG_corr
+
+        if p < 0.05:
+            print(f"p = {p} indicates a significant difference between the three keyword versions.")
+        else:
+            print(f"p = {p} indicates no significant difference.")
     else:
-        print("\nSphericity is violated => apply correction.")
-        p = p_GG_corr
-
-    if p < 0.05:
-        print(f"p = {p} indicates a significant difference between the three keyword versions.")
-    else:
-        print(f"p = {p} indicates no significant difference.")
+        print("To perform Repeated Measures ANOVA we need at least 3 groups.")
 
     # Pairwise comparisons
+    print("\nPost-hoc pairwise comparisons:")
+
     pairwise = pg.pairwise_tests(
         dv='precision',
         within='category',
@@ -79,7 +88,6 @@ for site in sites:
     pairwise['effect'] = pairwise['hedges'].apply(lambda h: "small" if abs(h) <= 0.2 else "large" if abs(h) >= 0.8 else "medium")
     pairwise['dir'] = pairwise['hedges'].apply(lambda h: "<" if h < 0 else ">" if h >= 0 else "=")
 
-    print("\nPost-hoc pairwise comparisons:")
     print(pairwise)
 
     print()
