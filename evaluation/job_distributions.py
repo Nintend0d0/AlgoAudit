@@ -1,12 +1,7 @@
 import os
-from itertools import combinations
-from functools import reduce
-import csv
-from numpy import tile
 import yaml
 import pandas as pd
 import warnings
-from plotly import graph_objs as go
 
 # Suppress the FutureWarning
 warnings.simplefilter(action='ignore', category=FutureWarning)

@@ -2,7 +2,6 @@ import os
 from itertools import combinations
 from functools import reduce
 import csv
-from numpy import tile
 import yaml
 import pandas as pd
 from plotly import graph_objs as go
