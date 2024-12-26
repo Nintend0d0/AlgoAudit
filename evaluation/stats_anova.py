@@ -32,7 +32,7 @@ for site in sites:
 
     anova_results = pg.anova(
         data=site_df,
-        dv='precision',
+        dv='recall',
         between='category',
         detailed=True,
     )
@@ -52,7 +52,7 @@ for site in sites:
     if calculate_rm_anova:
         anova_results = pg.rm_anova(
             data=site_df,
-            dv='precision',
+            dv='recall',
             within='category',
             subject='group',
             correction=True,
@@ -82,7 +82,7 @@ for site in sites:
     print("\nPost-hoc pairwise comparisons:")
 
     pairwise = pg.pairwise_tests(
-        dv='precision',
+        dv='recall',
         within='category',
         subject='group',
         data=site_df,
