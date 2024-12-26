@@ -20,6 +20,8 @@ for site in sites:
     site_df = anova_df.loc[(anova_df['site'] == site)]
 
     # Perform One-way ANOVA
+    print("1) One-way ANOVA:")
+
     anova_results = pg.anova(
         data=site_df,
         dv='precision',
@@ -28,7 +30,6 @@ for site in sites:
     )
     p = anova_results['p-unc'].iloc[0]  # Uncorrected p-value
 
-    print("1) One-way ANOVA:")
     print(anova_results)
 
     if p < 0.05:
@@ -38,18 +39,20 @@ for site in sites:
 
 
     # Perform Repeated Measures ANOVA with Greenhouse-Geisser correction if sphericity is violated
+    print("\n2) Repeated Measures ANOVA:")
+
     anova_results = pg.rm_anova(
         data=site_df,
         dv='precision',
         within='category',
         subject='group',
+        correction=True,
         detailed=True,
     )
     p_unc = anova_results['p-unc'].iloc[0]  # Uncorrected p-value
-    p_GG_corr = anova_results['p-GG-corr'].iloc[0]  # Greenhouse-Geisser corrected p-value
     sphericity = anova_results['sphericity'].iloc[0]  # Sphericity of the data (boolean)
+    p_GG_corr = anova_results['p-GG-corr'].iloc[0]  # Greenhouse-Geisser corrected p-value
 
-    print("\n2) Repeated Measures ANOVA:")
     print(anova_results)
 
     if sphericity:
