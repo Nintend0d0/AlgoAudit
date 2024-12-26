@@ -5,7 +5,7 @@ import seaborn as sns
 import os
 import numpy as np
 
-# define generalized Kendall's tau computation function 
+# define generalized Kendall's tau computation function
 def generalized_kendall_tau(x, y):
     x = np.array(x)
     y = np.array(y)
@@ -68,9 +68,9 @@ for file_name in file_list:
         pivoted = site_data.pivot_table(index="job ad id", columns="keyword", values="global_rank")
 
         # skip if fewer than 2 keywords, no sensible comparison possible
-        """if pivoted.shape[1] < 2:
+        if pivoted.shape[1] < 2:
             print(f"Skipping site '{site}' in file '{file_name}' due to insufficient keywords.")
-            continue"""
+            continue
 
         # calculate kendall's tau relevant keyword pairs
         search_terms = pivoted.columns

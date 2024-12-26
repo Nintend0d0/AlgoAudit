@@ -1,10 +1,9 @@
-import re
-
 from Scraper import Scraper
 from typing import Tuple
 import requests
 from bs4 import BeautifulSoup
 import math
+import re
 
 # IMPORTANT: Don't use print() use self.write()
 

@@ -2,7 +2,6 @@ import os
 from itertools import combinations
 from functools import reduce
 import csv
-from numpy import tile
 import yaml
 import pandas as pd
 from plotly import graph_objs as go
@@ -77,43 +76,6 @@ for csv_file in csv_files:
                 reduce(lambda a, b: a.intersection(b), results_per_keyword.values())
             )
 
-        """
-        for keyword in keywords:
-            job_ids = set(
-                site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique()
-            )
-            all_other_job_ids = set(
-                site_df.loc[site_df["keyword"] != keyword]["job ad id"].unique()
-            )
-            unique_jobs.setdefault(site, {})[keyword] = job_ids - all_other_job_ids
-
-        for pair in combinations(keywords, 2):
-            keyword, other_keyword = pair
-            job_ids = set(
-                site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique()
-            )
-            other_jobs = set(
-                site_df.loc[site_df["keyword"] == other_keyword]["job ad id"].unique()
-            )
-            intersect_jobs.setdefault(site, {})[pair] = job_ids.intersection(other_jobs)
-
-        if len(keywords) == 3:
-            job_ids = (
-                set(site_df.loc[site_df["keyword"] == keyword]["job ad id"].unique())
-                for keyword in keywords
-            )
-
-            def reducer(prev: set, current: set) -> set:
-                if prev:
-                    return prev.intersection(current)
-                return current
-
-            triplet = tuple(keywords)
-            intersect_jobs.setdefault(site, {})[tuple(keywords)] = reduce(
-                reducer, job_ids
-            )
-        """
-
 
 # *** print summary
 if DO_PRINT_SUMMARY:
@@ -179,17 +141,6 @@ if DO_VISUALIZE:
         for site in all_sites:
             bars: list[go.Bar] = []
 
-            # total jobs per site
-            """
-            bars.append(
-                go.Bar(
-                    y=[len(total_unique_jobs[group].get(site, {}))],
-                    text=[len(total_unique_jobs[group].get(site, {}))],
-                    name="Total",
-                )
-            )
-            """
-
             # unique jobs per keyword
             for keyword in KEYWORD_GROUPS[group]:
                 n = len(unique_jobs[site].get(keyword, {}))
@@ -222,11 +173,6 @@ if DO_VISUALIZE:
                         name=" ∩ ".join(all_intersection) + f" ({n})",
                     )
                 )
-
-            """
-            if bars:
-                bars.sort(key=lambda x: x.y[0], reverse=True)  # type: ignore
-            """
 
             fig = go.Figure(
                 data=bars,

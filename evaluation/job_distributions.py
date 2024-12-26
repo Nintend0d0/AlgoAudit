@@ -1,12 +1,7 @@
 import os
-from itertools import combinations
-from functools import reduce
-import csv
-from numpy import tile
 import yaml
 import pandas as pd
 import warnings
-from plotly import graph_objs as go
 
 # Suppress the FutureWarning
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -36,7 +31,7 @@ for group, keywords in keyword_groups.items():
 # gender-specific keywords and their corresponding category.
 
 # Prepare dataframe to perform statistics
-anova_cols = ['site', 'group','keyword','category', 'precision']
+anova_cols = ['site', 'group','keyword','category', 'recall']
 anova_df = pd.DataFrame(columns=anova_cols)
 
 groups = scraped_keywords['group'].unique()
@@ -53,14 +48,14 @@ for group in groups:
     for site in sites:
         temp_df = group_df.copy()
         temp_df['site'] = site
-        temp_df['precision'] = 0.0
+        temp_df['recall'] = 0.0
 
-        # Calculate precision
+        # Calculate recall
         site_df = results_df.loc[(results_df['site'] == site)]
         total_unique_jobs = len(set(site_df['job ad id'].unique()))
 
         if total_unique_jobs > 0:
-            temp_df['precision'] = temp_df['keyword'].apply(lambda kw:
+            temp_df['recall'] = temp_df['keyword'].apply(lambda kw:
                                                             site_df[site_df['keyword'] == kw].drop_duplicates(
                                                                 subset='job ad id').shape[0] / total_unique_jobs
                                                             )
