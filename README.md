@@ -1,6 +1,7 @@
 # Job Scraper & Evaluation
 
-For Seminar Algorithmic Auditing, FS24.
+For Seminar Algorithmic Auditing, University of Zurich, FS24.
+&copy; 2024 by Dominik Frauchiger, Mirjam Weibel, Jonas Zellweger
 
 ## Setup
 
